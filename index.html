@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La Atarraya de Don Pedro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --river-deep:#0F3D46;
+    --river:#1F6E7A;
+    --river-light:#eaf6f6;
+    --sand:#F3E4C4;
+    --sand-dark:#E0C99A;
+    --rope:#8A6A44;
+    --gold:#E8A33D;
+    --gold-dark:#C97F1E;
+    --ink:#0F3D46;
+    --good:#3E8E5A;
+    --bad:#C4553B;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Nunito', sans-serif;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(255,255,255,0.35), transparent 40%),
+      linear-gradient(180deg, var(--sand) 0%, var(--sand-dark) 100%);
+    color:var(--ink);
+    min-height:100vh;
+    padding:max(24px,env(safe-area-inset-top,0px)) 16px max(48px,env(safe-area-inset-bottom,0px));
+  }
+  h1,h2,h3{font-family:'Baloo 2', sans-serif; margin:0;}
+  .wrap{max-width:820px; margin:0 auto;}
+
+  .hero{
+    display:flex; align-items:center; gap:16px;
+    background:var(--river-deep);
+    color:white;
+    border-radius:20px;
+    padding:20px 24px;
+    box-shadow:0 6px 0 rgba(0,0,0,0.12);
+  }
+  .hero .fish-big{font-size:44px; line-height:1;}
+  .hero h1{font-size:26px; font-weight:800;}
+  .hero p{margin:4px 0 0; font-size:15px; opacity:0.85;}
+
+  .tabs{display:flex; gap:8px; margin:20px 0 16px;}
+  .tab{
+    flex:1;
+    text-align:center;
+    padding:12px 10px;
+    border-radius:14px;
+    background:rgba(255,255,255,0.5);
+    border:2px solid transparent;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    color:var(--river-deep);
+    cursor:pointer;
+    user-select:none;
+    transition:transform .12s ease, background .15s ease;
+  }
+  .tab:hover{transform:translateY(-1px);}
+  .tab.active{background:var(--gold); border-color:var(--gold-dark); color:var(--river-deep);}
+
+  .card{
+    background:white;
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 4px 0 rgba(0,0,0,0.06);
+    border:2px solid var(--sand-dark);
+  }
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .controls{
+    display:flex;
+    justify-content:center;
+    gap:36px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+  }
+  .stepper{text-align:center;}
+  .stepper .label{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    color:var(--river);
+    margin-bottom:6px;
+  }
+  .stepper .row{display:flex; align-items:center; gap:10px;}
+  .stepper button{
+    width:38px; height:38px;
+    border-radius:10px;
+    border:none;
+    background:var(--river);
+    color:white;
+    font-size:20px;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:0 3px 0 var(--river-deep);
+  }
+  .stepper button:active{transform:translateY(2px); box-shadow:none;}
+  .stepper .value{
+    font-family:'Baloo 2', sans-serif;
+    font-size:26px;
+    font-weight:800;
+    width:36px;
+    text-align:center;
+  }
+
+  .board-area{
+    display:flex;
+    justify-content:center;
+    margin:10px 0 18px;
+  }
+  #grid, #gridC{
+    display:grid;
+    gap:4px;
+    background:var(--rope);
+    padding:8px;
+    border-radius:12px;
+  }
+  .cell{
+    background:var(--river-light);
+    border-radius:5px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    aspect-ratio:1/1;
+  }
+  .cell.edge{background:#cdeaea;}
+  .cell.label{
+    background:transparent;
+    color:var(--river-deep);
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:13px;
+  }
+
+  .caption{
+    text-align:center;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    color:var(--river-deep);
+    font-size:15px;
+    margin-top:-6px;
+    margin-bottom:8px;
+  }
+
+  .formulas{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-top:10px;
+  }
+  .formula-pill{
+    background:var(--river-light);
+    border:2px solid var(--river);
+    border-radius:14px;
+    padding:10px 16px;
+    text-align:center;
+    font-family:'Baloo 2', sans-serif;
+  }
+  .formula-pill .name{font-size:12px; color:var(--river); font-weight:700;}
+  .formula-pill .eq{font-size:19px; font-weight:800; color:var(--river-deep);}
+
+  .challenge-target{
+    text-align:center;
+    background:var(--river-deep);
+    color:white;
+    border-radius:16px;
+    padding:16px;
+    margin-bottom:18px;
+  }
+  .challenge-target .goal{
+    font-family:'Baloo 2', sans-serif;
+    font-size:22px;
+    font-weight:800;
+    color:var(--gold);
+  }
+  .challenge-target p{margin:4px 0 0; font-size:14px; opacity:0.85;}
+
+  .feedback{
+    text-align:center;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    min-height:26px;
+    margin-top:6px;
+  }
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+
+  .actions{display:flex; justify-content:center; gap:10px; margin-top:14px;}
+  .btn{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    padding:10px 22px;
+    border-radius:12px;
+    border:none;
+    cursor:pointer;
+  }
+  .btn.primary{background:var(--gold); color:var(--river-deep); box-shadow:0 3px 0 var(--gold-dark);}
+  .btn.primary:active{transform:translateY(2px); box-shadow:none;}
+  .btn.check{background:var(--river); color:white; box-shadow:0 3px 0 var(--river-deep);}
+  .btn.check:active{transform:translateY(2px); box-shadow:none;}
+
+  .score{
+    text-align:center;
+    font-family:'Baloo 2', sans-serif;
+    color:var(--river);
+    font-weight:700;
+    margin-top:10px;
+    font-size:14px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="fish-big">🎣</div>
+    <div>
+      <h1>La Atarraya de Don Pedro</h1>
+      <p>Practica multiplicación, área y perímetro lanzando tu propia atarraya al río Magdalena.</p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="libre">🧵 Modo libre</div>
+    <div class="tab" data-tab="desafio">🏆 Modo desafío</div>
+  </div>
+
+  <div class="card">
+
+    <!-- MODO LIBRE -->
+    <div class="panel active" id="panel-libre">
+      <div class="controls">
+        <div class="stepper">
+          <div class="label">Filas</div>
+          <div class="row">
+            <button data-fn="changeFree" data-args="rows,-1">−</button>
+            <div class="value" id="rowsVal">3</div>
+            <button data-fn="changeFree" data-args="rows,1">+</button>
+          </div>
+        </div>
+        <div class="stepper">
+          <div class="label">Columnas</div>
+          <div class="row">
+            <button data-fn="changeFree" data-args="cols,-1">−</button>
+            <div class="value" id="colsVal">4</div>
+            <button data-fn="changeFree" data-args="cols,1">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="board-area"><div id="grid"></div></div>
+      <div class="caption" id="freeCaption">3 filas × 4 columnas</div>
+
+      <div class="formulas">
+        <div class="formula-pill">
+          <div class="name">ÁREA (huecos totales)</div>
+          <div class="eq" id="areaEq">3 × 4 = 12</div>
+        </div>
+        <div class="formula-pill">
+          <div class="name">PERÍMETRO (borde de la red)</div>
+          <div class="eq" id="periEq">2 × (3 + 4) = 14</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODO DESAFIO -->
+    <div class="panel" id="panel-desafio">
+      <div class="challenge-target">
+        <div class="goal" id="goalText">Arma una atarraya con ÁREA = 12</div>
+        <p>Usa los botones para cambiar filas y columnas hasta lograrlo.</p>
+      </div>
+
+      <div class="controls">
+        <div class="stepper">
+          <div class="label">Filas</div>
+          <div class="row">
+            <button data-fn="changeChal" data-args="rows,-1">−</button>
+            <div class="value" id="rowsValC">2</div>
+            <button data-fn="changeChal" data-args="rows,1">+</button>
+          </div>
+        </div>
+        <div class="stepper">
+          <div class="label">Columnas</div>
+          <div class="row">
+            <button data-fn="changeChal" data-args="cols,-1">−</button>
+            <div class="value" id="colsValC">2</div>
+            <button data-fn="changeChal" data-args="cols,1">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="board-area"><div id="gridC"></div></div>
+      <div class="caption" id="chalCaption">2 filas × 2 columnas</div>
+
+      <div class="formulas">
+        <div class="formula-pill">
+          <div class="name">ÁREA</div>
+          <div class="eq" id="areaEqC">2 × 2 = 4</div>
+        </div>
+        <div class="formula-pill">
+          <div class="name">PERÍMETRO</div>
+          <div class="eq" id="periEqC">2 × (2 + 2) = 8</div>
+        </div>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+
+      <div class="actions">
+        <button class="btn check" data-fn="checkChallenge" data-args="">Comprobar</button>
+        <button class="btn primary" data-fn="newChallenge" data-args="">Nuevo desafío</button>
+      </div>
+      <div class="score" id="scoreText">Aciertos: 0 &nbsp;|&nbsp; Intentos: 0</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const MAXV = 8;
+
+// ---------- Tabs ----------
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ---------- Render grid helper (con numeración de filas y columnas) ----------
+function renderGrid(container, rows, cols){
+  // +1 columna para la etiqueta de fila
+  container.style.gridTemplateColumns = `26px repeat(${cols}, minmax(26px,34px))`;
+  container.innerHTML = '';
+
+  // esquina vacía
+  const corner = document.createElement('div');
+  corner.className = 'cell label';
+  container.appendChild(corner);
+
+  // encabezado de columnas: 1, 2, 3... hasta cols
+  for(let c=1;c<=cols;c++){
+    const lab = document.createElement('div');
+    lab.className = 'cell label';
+    lab.textContent = c;
+    container.appendChild(lab);
+  }
+
+  // filas: etiqueta de fila + celdas de esa fila
+  for(let r=0;r<rows;r++){
+    const rlab = document.createElement('div');
+    rlab.className = 'cell label';
+    rlab.textContent = r+1;
+    container.appendChild(rlab);
+
+    for(let c=0;c<cols;c++){
+      const cell = document.createElement('div');
+      const isEdge = (r===0 || c===0 || r===rows-1 || c===cols-1);
+      cell.className = 'cell' + (isEdge ? ' edge' : '');
+      cell.textContent = ((r+c) % 2 === 0) ? '🐟' : '';
+      container.appendChild(cell);
+    }
+  }
+}
+
+// ---------- MODO LIBRE ----------
+let free = { rows:3, cols:4 };
+
+function updateFree(){
+  document.getElementById('rowsVal').textContent = free.rows;
+  document.getElementById('colsVal').textContent = free.cols;
+  renderGrid(document.getElementById('grid'), free.rows, free.cols);
+  document.getElementById('areaEq').textContent = `${free.rows} × ${free.cols} = ${free.rows*free.cols}`;
+  document.getElementById('periEq').textContent = `2 × (${free.rows} + ${free.cols}) = ${2*(free.rows+free.cols)}`;
+  document.getElementById('freeCaption').textContent = `${free.rows} filas × ${free.cols} columnas`;
+}
+function changeFree(key, delta){
+  free[key] = Math.min(MAXV, Math.max(1, free[key]+delta));
+  updateFree();
+}
+
+// ---------- MODO DESAFIO ----------
+let chal = { rows:2, cols:2 };
+let goalType = 'area';
+let goalValue = 12;
+let score = { hits:0, tries:0 };
+
+function randomGoal(){
+  goalType = Math.random() < 0.5 ? 'area' : 'perimetro';
+  const r = 2 + Math.floor(Math.random()*6);
+  const c = 2 + Math.floor(Math.random()*6);
+  goalValue = goalType === 'area' ? r*c : 2*(r+c);
+  document.getElementById('goalText').textContent =
+    goalType === 'area'
+      ? `Arma una atarraya con ÁREA = ${goalValue}`
+      : `Arma una atarraya con PERÍMETRO = ${goalValue}`;
+}
+
+function updateChallenge(){
+  document.getElementById('rowsValC').textContent = chal.rows;
+  document.getElementById('colsValC').textContent = chal.cols;
+  renderGrid(document.getElementById('gridC'), chal.rows, chal.cols);
+  document.getElementById('areaEqC').textContent = `${chal.rows} × ${chal.cols} = ${chal.rows*chal.cols}`;
+  document.getElementById('periEqC').textContent = `2 × (${chal.rows} + ${chal.cols}) = ${2*(chal.rows+chal.cols)}`;
+  document.getElementById('chalCaption').textContent = `${chal.rows} filas × ${chal.cols} columnas`;
+}
+function changeChal(key, delta){
+  chal[key] = Math.min(MAXV, Math.max(1, chal[key]+delta));
+  updateChallenge();
+}
+
+function checkChallenge(){
+  score.tries++;
+  const current = goalType === 'area' ? chal.rows*chal.cols : 2*(chal.rows+chal.cols);
+  const fb = document.getElementById('feedback');
+  if(current === goalValue){
+    score.hits++;
+    fb.textContent = '¡Muy bien! Lograste el objetivo. 🐟';
+    fb.className = 'feedback good';
+  } else {
+    fb.textContent = current < goalValue ? 'Casi... te falta un poco más.' : 'Casi... te pasaste un poco.';
+    fb.className = 'feedback bad';
+  }
+  document.getElementById('scoreText').textContent = `Aciertos: ${score.hits} | Intentos: ${score.tries}`;
+}
+
+function newChallenge(){
+  randomGoal();
+  chal = { rows:2, cols:2 };
+  updateChallenge();
+  const fb = document.getElementById('feedback');
+  fb.textContent = '';
+  fb.className = 'feedback';
+}
+
+// botones
+document.querySelectorAll('[data-fn]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var a=b.dataset.args?b.dataset.args.split(','):[];
+    var fn=b.dataset.fn;
+    if(fn==='changeFree')changeFree(a[0],parseInt(a[1],10));
+    else if(fn==='changeChal')changeChal(a[0],parseInt(a[1],10));
+    else if(fn==='checkChallenge')checkChallenge();
+    else if(fn==='newChallenge')newChallenge();
+  });
+});
+// init
+updateFree();
+randomGoal();
+updateChallenge();
+</script>
+</body>
+</html>
